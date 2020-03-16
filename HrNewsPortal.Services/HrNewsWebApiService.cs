@@ -66,7 +66,7 @@ namespace HrNewsPortal.Services
 
             try
             {
-                for (var i = startItemId; i <= (startItemId + takeItem); i++)
+                for (var i = startItemId; i < (startItemId + takeItem); i++)
                 {
                     var item = await GetItem(i);
 

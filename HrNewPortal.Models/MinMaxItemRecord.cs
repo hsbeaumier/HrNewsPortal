@@ -35,5 +35,7 @@ namespace HrNewsPortal.Models
         public int MinItemId { get; set; }
 
         public int MaxItemId { get; set; }
+
+        public int SnapShotRecordCount { get; set; }
     }
 }

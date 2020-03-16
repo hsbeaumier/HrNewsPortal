@@ -8,6 +8,8 @@ namespace HrNewsPortal.Data.Repositories
     {
         int GetMaxItemId();
 
+        void UpdateRecordStats();
+
         void InsertItemRecords(List<Item> items);
         
         Task<List<ItemRecord>> GetRangeItemRecords(string type, int takeItems, int startItemId, bool descending);

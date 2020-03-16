@@ -132,40 +132,40 @@ namespace HrNewsPortal.Data.Repositories
                         _adapter.Insert(record, _tableName, record.PartitionKey, record.RowKey);
                     }
                 }
+            }
+        }
 
-                // Save off max item identifier by Type in separate table.
-                // Create the resolver first.
-                var resolver = GetItemRecordResolver();
+        public void UpdateRecordStats()
+        {
+            // Save off max item identifier by Type in separate table.
+            // Create the resolver first.
+            var resolver = GetItemRecordResolver();
 
-                // Declare types that we will create a record for.
-                var types = new [] {"job", "story", "comment", "poll", "pollopt"};
+            // Declare types that we will create a record for.
+            var types = new[] { "job", "story", "comment", "poll", "pollopt" };
 
-                foreach (var type in types)
+            foreach (var type in types)
+            {
+                var filter = TableQuery.GenerateFilterCondition("Type", QueryComparisons.Equal, type);
+                
+                var query = new TableQuery();
+                query.FilterString = filter;
+
+                var getAllTask = _adapter.GetAll(_tableName, query, resolver);
+                getAllTask.Wait();
+
+                var itemRecordsForType = getAllTask.Result;
+
+                var minMaxRecord = new MinMaxItemRecord()
                 {
-                    var typeFilter = TableQuery.GenerateFilterCondition("Type", QueryComparisons.Equal, type);
-                    var notDeletedFilter = TableQuery.GenerateFilterConditionForBool("Deleted", QueryComparisons.Equal, false);
-                    var notDeadFilter = TableQuery.GenerateFilterConditionForBool("Dead", QueryComparisons.NotEqual, true);
-                    var exclusionsFilter = TableQuery.CombineFilters(notDeletedFilter, TableOperators.And, notDeadFilter);
-                    var finalFilter = TableQuery.CombineFilters(typeFilter, TableOperators.And, exclusionsFilter);
+                    PartitionKey = type,
+                    RowKey = "0",
+                    MinItemId = Convert.ToInt32(itemRecordsForType.Min(i => i.RowKey)),
+                    MaxItemId = Convert.ToInt32(itemRecordsForType.Max(i => i.RowKey)),
+                    SnapShotRecordCount = Convert.ToInt32(itemRecordsForType.Count)
+                };
 
-                    var query = new TableQuery();
-                    query.FilterString = finalFilter;
-                    
-                    var getAllTask = _adapter.GetAll(_tableName, query, resolver);
-                    getAllTask.Wait();
-
-                    var itemRecordsForType = getAllTask.Result;
-
-                    var minMaxRecord = new MinMaxItemRecord()
-                    {
-                        PartitionKey = type,
-                        RowKey = "0",
-                        MinItemId = Convert.ToInt32(itemRecordsForType.Min(i => i.RowKey)),
-                        MaxItemId = Convert.ToInt32(itemRecordsForType.Max(i => i.RowKey))
-                    };
-
-                    _adapter.Save(minMaxRecord, _minMaxRecordTableName, minMaxRecord.PartitionKey, minMaxRecord.RowKey);
-                }
+                _adapter.Save(minMaxRecord, _minMaxRecordTableName, minMaxRecord.PartitionKey, minMaxRecord.RowKey);
             }
         }
 

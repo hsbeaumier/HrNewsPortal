@@ -66,15 +66,21 @@ namespace HrNewsPortal.DataLoader.WebJob
             {
                 try
                 {
+                    _repo.UpdateRecordStats();
+
                     var maxItemId = _repo.GetMaxItemId();
                     var startItemId = maxItemId + 1;
                     var maxTakeItem = _settings.MaxTakeItem;
-                    var endItemId = await _service.GetMaxItemId();
+                    var getMaxItemIdTask = _service.GetMaxItemId();
+                    getMaxItemIdTask.Wait(cancellationToken);
+                    var endItemId = getMaxItemIdTask.Result;
                     var remaining = endItemId - maxItemId;
 
                     var takeItem = Math.Min(maxTakeItem, remaining);
-                    
-                    var newItems = await _service.GetItems(startItemId, takeItem);
+
+                    var getItemsTask = _service.GetItems(startItemId, takeItem);
+                    getItemsTask.Wait(cancellationToken);
+                    var newItems = getItemsTask.Result;
 
                     _repo.InsertItemRecords(newItems);
                 }
@@ -83,7 +89,7 @@ namespace HrNewsPortal.DataLoader.WebJob
                     Log.Error().Exception(e).Message("Failed to load data from Hr News Web Api.").Write();
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(5));
+                Thread.Sleep(TimeSpan.FromSeconds(2));
             }
         }
 
