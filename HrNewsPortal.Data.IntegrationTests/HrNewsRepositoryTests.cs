@@ -56,8 +56,8 @@ namespace HrNewsPortal.Data.IntegrationTests
         public void InsertItemRecordsTest()
         {
             var startItemId = 1001;
-            var endItemId = 2000;
-            var newItemsTask = _service.GetItems(startItemId, endItemId);
+            var takeItems = 1000;
+            var newItemsTask = _service.GetItems(startItemId, takeItems);
             newItemsTask.Wait();
             var newItems = newItemsTask.Result;
 

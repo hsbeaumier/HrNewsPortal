@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -7,7 +8,6 @@ using NLog.Fluent;
 using HrNewsPortal.Data.Repositories;
 using HrNewsPortal.Models;
 using HrNewsPortal.Services;
-using HrNewsPortal.Services.Builders;
 
 namespace HrNewsPortal.DataLoader.WebJob
 {
@@ -66,11 +66,13 @@ namespace HrNewsPortal.DataLoader.WebJob
             {
                 try
                 {
-                    var startItemId = _repo.GetMaxItemId() + 1;
+                    var maxItemId = _repo.GetMaxItemId();
+                    var startItemId = maxItemId + 1;
                     var maxTakeItem = _settings.MaxTakeItem;
                     var endItemId = await _service.GetMaxItemId();
+                    var remaining = endItemId - maxItemId;
 
-                    var takeItem = Math.Min((startItemId + maxTakeItem), endItemId);
+                    var takeItem = Math.Min(maxTakeItem, remaining);
                     
                     var newItems = await _service.GetItems(startItemId, takeItem);
 
@@ -81,7 +83,7 @@ namespace HrNewsPortal.DataLoader.WebJob
                     Log.Error().Exception(e).Message("Failed to load data from Hr News Web Api.").Write();
                 }
 
-                Thread.Sleep(TimeSpan.FromMinutes(5));
+                Thread.Sleep(TimeSpan.FromSeconds(5));
             }
         }
 
