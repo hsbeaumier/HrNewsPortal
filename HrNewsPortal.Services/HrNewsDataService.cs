@@ -25,7 +25,27 @@ namespace HrNewsPortal.Services
 
         #region methods
 
-        public List<Story> GetStories(int topStories, int commentLevels)
+        public Story GetStory(int itemId)
+        {
+            var itemRecord = _repo.GetItem("story", itemId);
+
+            if (itemRecord != null)
+            {
+                return new Story()
+                {
+                    Id = itemRecord.Id,
+                    By = itemRecord.By,
+                    Score = itemRecord.Score,
+                    Time = itemRecord.Time,
+                    Url = itemRecord.Url,
+                    Kids = ParseIntegers(itemRecord.Kids)
+                };
+            }
+
+            return null;
+        }
+
+        public List<Story> GetStories(int topStories)
         {
             var maxStoryId = _repo.GetMaxItemId("story");
 
@@ -35,20 +55,20 @@ namespace HrNewsPortal.Services
 
             var itemRecords = task.Result;
 
-            return TransformItemToStory(itemRecords, commentLevels);
+            return TransformItemToStory(itemRecords);
         }
         
-        public List<Story> GetStories(List<int> storyIds, int commentLevels)
+        public List<Story> GetStories(List<int> storyIds)
         {
             var task = _repo.GetRangeItemRecords(storyIds);
             task.Wait();
 
             var itemRecords = task.Result;
             
-            return TransformItemToStory(itemRecords, commentLevels);
+            return TransformItemToStory(itemRecords);
         }
 
-        public List<Story> SearchStories(string by, string time, string url, string score, int commentLevels)
+        public List<Story> SearchStories(string by, string time, string url, string score)
         {
             var criteria = new Dictionary<string, object>();
 
@@ -80,10 +100,30 @@ namespace HrNewsPortal.Services
 
             var itemRecords = _repo.SearchItemRecords("story", criteria);
             
-            return TransformItemToStory(itemRecords, commentLevels);
+            return TransformItemToStory(itemRecords);
         }
 
-        public List<Comment> GetComments(int topComments, int commentLevels)
+        public Comment GetComment(int itemId)
+        {
+            var itemRecord = _repo.GetItem("comment", itemId);
+
+            if (itemRecord != null)
+            {
+                return new Comment()
+                {
+                    Id = itemRecord.Id,
+                    By = itemRecord.By,
+                    Parent = itemRecord.Parent,
+                    Text = itemRecord.Text,
+                    Time = itemRecord.Time,
+                    Kids = ParseIntegers(itemRecord.Kids)
+                };
+            }
+
+            return null;
+        }
+
+        public List<Comment> GetComments(int topComments)
         {
             var maxCommentId = _repo.GetMaxItemId("comment");
 
@@ -93,20 +133,20 @@ namespace HrNewsPortal.Services
 
             var itemRecords = task.Result;
 
-            return TransformItemToComment(itemRecords, commentLevels, 0);
+            return TransformItemToComment(itemRecords);
         }
 
-        public List<Comment> GetComments(List<int> commentIds, int commentLevels)
+        public List<Comment> GetComments(List<int> commentIds)
         {
             var task = _repo.GetRangeItemRecords(commentIds);
             task.Wait();
 
             var itemRecords = task.Result;
 
-            return TransformItemToComment(itemRecords, commentLevels, 0);
+            return TransformItemToComment(itemRecords);
         }
 
-        public List<Comment> SearchComments(string by, string time, string text, int commentLevels)
+        public List<Comment> SearchComments(string by, string time, string text)
         {
             var criteria = new Dictionary<string, object>();
 
@@ -130,10 +170,31 @@ namespace HrNewsPortal.Services
 
             var itemRecords = _repo.SearchItemRecords("comment", criteria);
 
-            return TransformItemToComment(itemRecords, commentLevels, 0);
+            return TransformItemToComment(itemRecords);
         }
 
-        public List<Poll> GetPolls(int topPolls, int commentLevels)
+        public Poll GetPoll(int itemId)
+        {
+            var itemRecord = _repo.GetItem("poll", itemId);
+
+            if (itemRecord != null)
+            {
+                return new Poll()
+                {
+                    Id = itemRecord.Id,
+                    By = itemRecord.By,
+                    Descendant = itemRecord.Kids.Count(),
+                    Text = itemRecord.Text,
+                    Time = itemRecord.Time,
+                    Parts = ParseIntegers(itemRecord.Parts),
+                    Kids = ParseIntegers(itemRecord.Kids)
+                };
+            }
+
+            return null;
+        }
+
+        public List<Poll> GetPolls(int topPolls)
         {
             var maxPollId = _repo.GetMaxItemId("poll");
 
@@ -141,20 +202,20 @@ namespace HrNewsPortal.Services
             task.Wait();
             var itemRecords = task.Result;
 
-            return TransformItemToPoll(itemRecords, commentLevels);
+            return TransformItemToPoll(itemRecords);
         }
 
-        public List<Poll> GetPolls(List<int> pollIds, int commentLevels)
+        public List<Poll> GetPolls(List<int> pollIds)
         {
             var task = _repo.GetRangeItemRecords(pollIds);
             task.Wait();
 
             var itemsRecords = task.Result;
 
-            return TransformItemToPoll(itemsRecords, commentLevels);
+            return TransformItemToPoll(itemsRecords);
         }
 
-        public List<Poll> SearchPolls(string by, string time, string text, string score, string title, int commentLevels)
+        public List<Poll> SearchPolls(string by, string time, string text, string score, string title)
         {
             var criteria = new Dictionary<string, object>();
 
@@ -191,7 +252,7 @@ namespace HrNewsPortal.Services
 
             var itemRecords = _repo.SearchItemRecords("poll", criteria);
 
-            return TransformItemToPoll(itemRecords, commentLevels);
+            return TransformItemToPoll(itemRecords);
         }
 
         public List<PollOption> GetPollsOptions(List<int> pollOptionIds)
@@ -298,46 +359,45 @@ namespace HrNewsPortal.Services
         //    return users.ToList();
         //}
 
-        private List<Story> TransformItemToStory(List<ItemRecord> records, int commentLevels)
+        private List<Story> TransformItemToStory(List<ItemRecord> records)
         {
             return records.Select(r => new Story()
             {
                 Id = r.Id,
                 By = r.By,
-                Kids = GetChildComments(r.Kids, commentLevels, 0)?.ToArray(),
+                Kids = ParseIntegers(r.Kids),
                 Score = r.Score,
                 Time = r.Time,
                 Url = r.Url
             }).ToList();
         }
         
-        private List<Comment> TransformItemToComment(List<ItemRecord> records, int commentLevels, int currentCommentLevel)
+        private List<Comment> TransformItemToComment(List<ItemRecord> records)
         {
             return records.Select(r => new Comment()
             {
                 Id = r.Id,
                 By = r.By,
-                Kids = GetChildComments(r.Kids, commentLevels, currentCommentLevel)?.ToArray(),
-                ParentComment = GetComment(r.Parent),
-                ParentStory = GetStory(r.Parent),
+                Kids = ParseIntegers(r.Kids),
+                Parent = r.Parent,
                 Text = r.Text,
                 Time = r.Time
             }).ToList();
         }
 
-        private List<Poll> TransformItemToPoll(List<ItemRecord> records, int commentLevels)
+        private List<Poll> TransformItemToPoll(List<ItemRecord> records)
         {
             return records.Select(r => new Poll()
             {
                 Id = r.Id,
                 By = r.By,
-                Kids = GetChildComments(r.Kids, commentLevels, 0)?.ToArray(),
+                Kids = ParseIntegers(r.Kids),
                 Descendant = r.Kids.Count(),
                 Score = r.Score,
                 Text = r.Text,
                 Time = r.Time,
                 Title = r.Title,
-                Parts = GetPollOptions(r.Parts).ToArray()
+                Parts = ParseIntegers(r.Parts)
             }).ToList();
         }
 
@@ -364,45 +424,19 @@ namespace HrNewsPortal.Services
                 Score = r.Score,
                 Text = r.Text,
                 Time = r.Time,
-                Poll = GetPoll(r.Poll)
+                PollId = r.Poll
             }).ToList();
         }
-
-        private List<Comment> GetChildComments(string kidsText, int commentLevels, int currentCommentLevel)
-        {
-            var childComments = new List<Comment>();
-
-            if (currentCommentLevel + 1 > commentLevels)
-            {
-                return null;
-            }
-
-            if (!string.IsNullOrWhiteSpace(kidsText))
-            {
-                var kidTextIds = kidsText.Split(new[] { ',' }, StringSplitOptions.None);
-                var kidIds = kidTextIds.Select(kti => Convert.ToInt32(kti)).ToList();
-
-                var task = _repo.GetRangeItemRecords(kidIds);
-                task.Wait();
-
-                var itemRecords = task.Result;
-
-                return TransformItemToComment(itemRecords, commentLevels, currentCommentLevel + 1).ToList();
-            }
-
-            return null;
-        }
-
+        
         private List<PollOption> GetPollOptions(string partsText)
         {
             var pollOptions = new List<PollOption>();
 
             if (!string.IsNullOrWhiteSpace(partsText))
             {
-                var partsTextIds = partsText.Split(new[] { ',' }, StringSplitOptions.None);
-                var partsIds = partsTextIds.Select(pti => Convert.ToInt32(pti)).ToList();
+                var partsIds = ParseIntegers(partsText);
 
-                var task = _repo.GetRangeItemRecords(partsIds);
+                var task = _repo.GetRangeItemRecords(partsIds.ToList());
                 task.Wait();
 
                 var itemRecords = task.Result;
@@ -412,66 +446,17 @@ namespace HrNewsPortal.Services
 
             return null;
         }
-
-        private Story GetStory(int itemId)
-        {
-            var itemRecord = _repo.GetItem("story", itemId);
-
-            if (itemRecord != null)
-            {
-                return new Story()
-                {
-                    Id = itemRecord.Id,
-                    By = itemRecord.By,
-                    Score = itemRecord.Score,
-                    Time = itemRecord.Time,
-                    Url = itemRecord.Url
-                };
-            }
-
-            return null;
-        }
-
-        private Comment GetComment(int itemId)
-        {
-            var itemRecord = _repo.GetItem("comment", itemId);
-
-            if (itemRecord != null)
-            {
-                return new Comment()
-                {
-                    Id = itemRecord.Id,
-                    By = itemRecord.By,
-                    ParentComment = GetComment(itemRecord.Id),
-                    ParentStory = GetStory(itemRecord.Id),
-                    Text = itemRecord.Text,
-                    Time = itemRecord.Time
-                };
-            }
-
-            return null;
-        }
-
-        private Poll GetPoll(int itemId)
-        {
-            var itemRecord = _repo.GetItem("poll", itemId);
-
-            if (itemRecord != null)
-            {
-                return new Poll()
-                {
-                    Id = itemRecord.Id,
-                    By = itemRecord.By,
-                    Descendant = itemRecord.Kids.Count(),
-                    Text = itemRecord.Text,
-                    Time = itemRecord.Time,
-                    Parts = GetPollOptions(itemRecord.Parts).ToArray()
-                };
-            }
-
-            return null;
-        }
         
+        private int[] ParseIntegers(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return new int[] { };
+            }
+
+            return text.Split(',').Select(t => Convert.ToInt32(t)).ToArray();
+        }
+
         #endregion
     }
 }

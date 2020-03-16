@@ -23,7 +23,12 @@ namespace HrNewsPortal.Models
         /// The identifiers of the item's
         /// comments, in ranked display order.
         /// </summary>
-        public Comment[] Kids { get; set; }
+        public int[] Kids { get; set; }
+
+        /// <summary>
+        /// The comments, in ranked display order.
+        /// </summary>
+        public Comment[] Comments { get; set; }
 
         /// <summary>
         /// The URL of the story.

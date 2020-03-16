@@ -23,7 +23,12 @@ namespace HrNewsPortal.Models
         /// The comment story or poll text.
         /// </summary>
         public string Text { get; set; }
-        
+
+        /// <summary>
+        /// The poll option's associated poll identifer.
+        /// </summary>
+        public int PollId { get; set; }
+
         /// <summary>
         /// The poll option's associated poll.
         /// </summary>

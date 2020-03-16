@@ -1,28 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HrNewsPortal.Models;
 
 namespace HrNewsPortal.Services
 {
     public interface IHrNewsDataService
     {
-        List<Story> GetStories(int topStories, int commentLevels);
+        Story GetStory(int itemId);
 
-        List<Story> GetStories(List<int> storyIds, int commentLevels);
+        List<Story> GetStories(int topStories);
 
-        List<Story> SearchStories(string by, string time, string url, string score, int commentLevels);
+        List<Story> GetStories(List<int> storyIds);
 
-        List<Comment> GetComments(int topComments, int commentLevels);
+        List<Story> SearchStories(string by, string time, string url, string score);
 
-        List<Comment> GetComments(List<int> commentIds, int commentLevels);
+        Comment GetComment(int itemId);
 
-        List<Comment> SearchComments(string by, string time, string text, int commentLevels);
+        List<Comment> GetComments(int topComments);
 
-        List<Poll> GetPolls(int topPolls, int commentLevels);
+        List<Comment> GetComments(List<int> commentIds);
 
-        List<Poll> GetPolls(List<int> pollIds, int commentLevels);
+        List<Comment> SearchComments(string by, string time, string text);
 
-        List<Poll> SearchPolls(string by, string time, string text, string score, string title, int commentLevels);
+        List<Poll> GetPolls(int topPolls);
+
+        Poll GetPoll(int itemId);
+
+        List<Poll> GetPolls(List<int> pollIds);
+
+        List<Poll> SearchPolls(string by, string time, string text, string score, string title);
 
         List<PollOption> GetPollsOptions(List<int> pollOptions);
 

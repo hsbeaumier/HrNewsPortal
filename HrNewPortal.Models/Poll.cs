@@ -25,9 +25,15 @@ namespace HrNewsPortal.Models
         public string Text { get; set; }
 
         /// <summary>
-        /// The item's comments, in ranked display order.
+        /// The identifiers of the item's
+        /// comments, in ranked display order.
         /// </summary>
-        public Comment[] Kids { get; set; }
+        public int[] Kids { get; set; }
+
+        /// <summary>
+        /// The comments, in ranked display order.
+        /// </summary>
+        public Comment[] Comments { get; set; }
 
         /// <summary>
         /// The story's score, or the votes
@@ -41,12 +47,20 @@ namespace HrNewsPortal.Models
         public string Title { get; set; }
 
         /// <summary>
+        /// A list of related Poll Options ids.
+        /// </summary>
+        /// <remarks>
+        /// Come in display order.
+        /// </remarks>
+        public int[] Parts { get; set; }
+
+        /// <summary>
         /// A list of related Poll Options.
         /// </summary>
         /// <remarks>
         /// Come in display order.
         /// </remarks>
-        public PollOption[] Parts { get; set; }
+        public PollOption[] PollOptions { get; set; }
 
         /// <summary>
         /// In the case of stories or polls,

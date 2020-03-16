@@ -25,18 +25,29 @@ namespace HrNewsPortal.Models
         public string Text { get; set; }
         
         /// <summary>
+        /// The comment's parent identifier.
+        /// </summary>
+        public int Parent { get; set; }
+
+        /// <summary>
         /// The comment's parent which is relevant to the story.
         /// </summary>
         public Story ParentStory { get; set; }
 
         /// <summary>
-        /// The comment's parent which is another comment
+        /// The comment's parent which is another comment.
         /// </summary>
         public Comment ParentComment { get; set; }
 
         /// <summary>
+        /// The identifiers of the item's
+        /// comments, in ranked display order.
+        /// </summary>
+        public int[] Kids { get; set; }
+
+        /// <summary>
         /// The comments, in ranked display order.
         /// </summary>
-        public Comment[] Kids { get; set; }
+        public Comment[] Comments { get; set; }
     }
 }
