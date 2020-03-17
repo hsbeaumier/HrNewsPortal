@@ -156,16 +156,19 @@ namespace HrNewsPortal.Data.Repositories
 
                 var itemRecordsForType = getAllTask.Result;
 
-                var minMaxRecord = new MinMaxItemRecord()
+                if (itemRecordsForType.Any())
                 {
-                    PartitionKey = type,
-                    RowKey = "0",
-                    MinItemId = itemRecordsForType.Min(i => Convert.ToInt32(i.RowKey)),
-                    MaxItemId = itemRecordsForType.Max(i => Convert.ToInt32(i.RowKey)),
-                    SnapShotRecordCount = Convert.ToInt32(itemRecordsForType.Count)
-                };
+                    var minMaxRecord = new MinMaxItemRecord()
+                    {
+                        PartitionKey = type,
+                        RowKey = "0",
+                        MinItemId = itemRecordsForType.Min(i => Convert.ToInt32(i.RowKey)),
+                        MaxItemId = itemRecordsForType.Max(i => Convert.ToInt32(i.RowKey)),
+                        SnapShotRecordCount = Convert.ToInt32(itemRecordsForType.Count)
+                    };
 
-                _adapter.Save(minMaxRecord, _minMaxRecordTableName, minMaxRecord.PartitionKey, minMaxRecord.RowKey);
+                    _adapter.Save(minMaxRecord, _minMaxRecordTableName, minMaxRecord.PartitionKey, minMaxRecord.RowKey);
+                }
             }
         }
 
