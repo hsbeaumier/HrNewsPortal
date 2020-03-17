@@ -160,8 +160,8 @@ namespace HrNewsPortal.Data.Repositories
                 {
                     PartitionKey = type,
                     RowKey = "0",
-                    MinItemId = Convert.ToInt32(itemRecordsForType.Min(i => i.RowKey)),
-                    MaxItemId = Convert.ToInt32(itemRecordsForType.Max(i => i.RowKey)),
+                    MinItemId = itemRecordsForType.Min(i => Convert.ToInt32(i.RowKey)),
+                    MaxItemId = itemRecordsForType.Max(i => Convert.ToInt32(i.RowKey)),
                     SnapShotRecordCount = Convert.ToInt32(itemRecordsForType.Count)
                 };
 
@@ -299,7 +299,7 @@ namespace HrNewsPortal.Data.Repositories
             {
                 var keyValue = keyValues.FirstOrDefault(kv => kv.Key.Equals("Time"));
 
-                var filteredItemsList = itemList.Where(il => il.Time != null && il.Time == Convert.ToDateTime(keyValue.Value));
+                var filteredItemsList = itemList.Where(il => il.Time != null && il.Time.Value.Date == Convert.ToDateTime(keyValue.Value).Date);
 
                 foreach (var filteredItem in filteredItemsList)
                 {

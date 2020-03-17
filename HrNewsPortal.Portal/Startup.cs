@@ -1,3 +1,6 @@
+using HrNewsPortal.Data.Repositories;
+using HrNewsPortal.Services;
+using HrNewsPortal.Services.Builders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -27,6 +30,15 @@ namespace HrNewsPortal.Portal
             });
 
             // Dependency Injection
+            services.AddSingleton(Configuration);
+
+            var generalSettings = GeneralSettingsBuilder.Build(Configuration);
+            services.AddSingleton(generalSettings);
+            
+            services.AddScoped<IHrNewsRepository, HrNewsRepository>();
+            services.AddScoped<IHrNewsDataService, HrNewsDataService>();
+
+            services.AddSingleton(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

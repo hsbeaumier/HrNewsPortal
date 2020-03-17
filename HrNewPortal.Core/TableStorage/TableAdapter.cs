@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HrNewsPortal.Core.Models;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
-
+using NLog.Fluent;
 
 namespace HrNewsPortal.Core.TableStorage
 {
@@ -60,18 +57,25 @@ namespace HrNewsPortal.Core.TableStorage
 
         public async void Insert<TModel>(TModel source, string tableName, string partitionKeyName, string rowKeyName)
         {
-            var table = GetTable(tableName);
-
-            var existsTask = table.ExistsAsync();
-            existsTask.Wait();
-            if (!existsTask.Result)
+            try
             {
-                var createTableTask = table.CreateIfNotExistsAsync();
-                createTableTask.Wait();
-            }
+                var table = GetTable(tableName);
 
-            var operation = BuildOperation(source, partitionKeyName, rowKeyName, TableOperation.Insert);
-            await table.ExecuteAsync(operation);
+                var existsTask = table.ExistsAsync();
+                existsTask.Wait();
+                if (!existsTask.Result)
+                {
+                    var createTableTask = table.CreateIfNotExistsAsync();
+                    createTableTask.Wait();
+                }
+
+                var operation = BuildOperation(source, partitionKeyName, rowKeyName, TableOperation.Insert);
+                await table.ExecuteAsync(operation);
+            }
+            catch (Exception e)
+            {
+                Log.Error().Exception(e).Message($"Failed to log record for partition key \"{partitionKeyName}\" and row key \"{rowKeyName}\".").Write();
+            }
         }
 
         public async void Save<TModel>(TModel source, string tableName, string partitionKeyName, string rowKeyName)

@@ -40,5 +40,10 @@ namespace HrNewsPortal.Models
         /// for a pollopt (poll option).
         /// </summary>
         public int Score { get; set; }
+
+        /// <summary>
+        /// The title of the story, poll, or job.
+        /// </summary>
+        public string Title { get; set; }
     }
 }

@@ -9,22 +9,6 @@
         "js/bootstrap.min.js",
         "css/bootstrap.min.css"
       ]
-    },
-    {
-      "library": "moment.js@2.24.0",
-      "destination": "wwwroot/lib/moment.js/",
-      "files": [
-        "moment.min.js",
-        "moment-with-locales.min.js"
-      ]
-    },
-    {
-      "library": "moment-timezone@0.5.23",
-      "destination": "wwwroot/lib/moment-timezone/",
-      "files": [
-        "moment-timezone.min.js",
-        "moment-timezone-with-data.min.js"
-      ]
     }
   ]
 }

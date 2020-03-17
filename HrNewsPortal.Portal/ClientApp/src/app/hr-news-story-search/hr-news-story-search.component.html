@@ -1,0 +1,48 @@
+<h2 id="tableLabel">News Story Search</h2>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm"><strong>By:</strong></div>
+    <div class="col-sm">
+      <input type="text" id="txtBy" name="txtBy" [(ngModel)]="byCriteria" />
+    </div>
+    <div class="col-sm"><strong>Time:</strong></div>
+    <div class="col-sm">
+      <input type="date" id="txtTime" name="txtTime" [(ngModel)]="timeCriteria" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm"><strong>Url:</strong></div>
+    <div class="col-sm">
+      <input type="url" id="txtUrl" name="txtUrl" [(ngModel)]="urlCriteria" />
+    </div>
+    <div class="col-sm"><strong>Score:</strong></div>
+    <div class="col-sm">
+      <input type="number" min="0" id="txtScore" name="txtScore" [(ngModel)]="scoreCriteria" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm">
+      <input type="button" value="Search" (click)="searchForStories()" />
+    </div>
+  </div>
+</div>
+<p><i style="color: red">Please note that the search criteria above is OR based.  It will return records matching each criteria.</i></p>
+
+<div *ngIf="stories">
+  <div class="card" *ngFor="let story of stories; let i = index">
+    <div class="card-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm"><strong style="white-space: nowrap;">Story:</strong></div>
+          <div class="col-md"><a href="{{ story.url }}">{{ story.title }}</a></div>
+          <div class="col-sm"><strong style="white-space: nowrap;">By:</strong></div>
+          <div class="col-sm">{{ story.by }}</div>
+          <div class="col-sm"><strong style="white-space: nowrap;">Score:</strong></div>
+          <div class="col-sm">{{ story.score }}</div>
+        </div>
+      </div>
+      <app-hr-news-comments [story]="story" [index]="i"></app-hr-news-comments>
+    </div>
+  </div>
+</div>

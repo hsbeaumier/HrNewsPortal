@@ -8,6 +8,8 @@ namespace HrNewsPortal.Data.Repositories
     {
         int GetMaxItemId();
 
+        int GetMaxItemId(string type);
+
         void UpdateRecordStats();
 
         void InsertItemRecords(List<Item> items);

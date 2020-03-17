@@ -1,0 +1,26 @@
+<h2 id="tableLabel">News Stories</h2>
+
+<p *ngIf="!topStories"><em>Loading...</em></p>
+
+Number of Stories:&nbsp;&nbsp;
+<input type="number" min="1" max="200" id="txtNumberOfStories" name="txtNumberOfStories" [(ngModel)]="numberOfStories" />
+&nbsp;&nbsp;
+<input type="button" value="Refresh" (click)="updateTopStories()" />
+
+<div *ngIf="topStories">
+  <div class="card" *ngFor="let story of topStories; let i = index">
+    <div class="card-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm"><strong style="white-space: nowrap;">Story:</strong></div>
+          <div class="col-md"><a href="{{ story.url }}">{{ story.title }}</a></div>
+          <div class="col-sm"><strong style="white-space: nowrap;">By:</strong></div>
+          <div class="col-sm">{{ story.by }}</div>
+          <div class="col-sm"><strong style="white-space: nowrap;">Score:</strong></div>
+          <div class="col-sm">{{ story.score }}</div>
+        </div>
+      </div>
+      <app-hr-news-comments [story]="story" [index]="i"></app-hr-news-comments>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12"><button class="btn btn-link" (click)="loadMoreComments(index,5)">Load Comments...</button></div>
+  </div>
+  <div *ngIf="story.comments">
+    <div class="row" *ngFor="let comment of story.comments">
+      <div class="col-sm"><strong style="white-space: nowrap;">User:</strong></div>
+      <div class="col-sm">{{comment.by}}</div>
+      <div class="col-sm"><strong style="white-space: nowrap;">Comment:</strong></div>
+      <div class="col-lg">{{comment.text}}</div>
+      <div class="col-sm"><strong style="white-space: nowrap;">Time:</strong></div>
+      <div class="col-sm">{{comment.time}}</div>
+    </div>
+    <!--<div class="row" *ngIf="comment.kids.length > 0">
+      <div class="col-12"><app-hr-news-comments [commentId]="comment.id"></app-hr-news-comments></div>
+    </div>-->
+  </div>
+</div>

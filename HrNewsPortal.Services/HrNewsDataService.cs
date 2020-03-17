@@ -10,13 +10,13 @@ namespace HrNewsPortal.Services
     {
         #region fields
 
-        private HrNewsRepository _repo;
+        private IHrNewsRepository _repo;
 
         #endregion
 
         #region constructor
 
-        public HrNewsDataService(HrNewsRepository repo)
+        public HrNewsDataService(IHrNewsRepository repo)
         {
             _repo = repo;
         }
@@ -38,7 +38,8 @@ namespace HrNewsPortal.Services
                     Score = itemRecord.Score,
                     Time = itemRecord.Time,
                     Url = itemRecord.Url,
-                    Kids = ParseIntegers(itemRecord.Kids)
+                    Kids = ParseIntegers(itemRecord.Kids),
+                    Title = itemRecord.Title
                 };
             }
 
@@ -92,7 +93,7 @@ namespace HrNewsPortal.Services
 
             if (!string.IsNullOrWhiteSpace(score))
             {
-                if (Int32.TryParse(time, out int criteriaScore))
+                if (Int32.TryParse(score, out int criteriaScore))
                 {
                     criteria.Add("Score", criteriaScore);
                 }
@@ -368,7 +369,8 @@ namespace HrNewsPortal.Services
                 Kids = ParseIntegers(r.Kids),
                 Score = r.Score,
                 Time = r.Time,
-                Url = r.Url
+                Url = r.Url,
+                Title = r.Title
             }).ToList();
         }
         
