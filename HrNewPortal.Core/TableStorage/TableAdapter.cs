@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HrNewsPortal.Core.Models;
 using Microsoft.WindowsAzure.Storage;
@@ -120,18 +121,25 @@ namespace HrNewsPortal.Core.TableStorage
             var results = new List<TModel>();
             
             var table = GetTable(tableName);
-            
-            var token = new TableContinuationToken();
-            var entities = await table.ExecuteQuerySegmentedAsync(query, resolver, token);
-            
-            foreach (var entity in entities)
-            {
-                entity.PartitionKey = entity.PartitionKey;
-                entity.RowKey = entity.RowKey;
-                entity.Timestamp = entity.Timestamp;
-                results.Add(entity);
-            }
 
+            var token = new TableContinuationToken();
+
+            TableQuerySegment<TModel> entities = null;
+
+            do
+            {
+                entities = await table.ExecuteQuerySegmentedAsync(query, resolver, token);
+                
+                if (entities != null && entities.Any())
+                {
+                    results.AddRange(entities);
+
+                    token = entities.ContinuationToken;
+                }
+
+            } while (!string.IsNullOrWhiteSpace(token?.NextPartitionKey)
+                     && !string.IsNullOrWhiteSpace(token?.NextRowKey));
+            
             return results;
         }
         
